@@ -44,7 +44,7 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
               onPressed: () {
                 _authentication.signOut();
-                Navigator.pop(context);
+                // Navigator.pop(context);
               },
             )
           ],
@@ -58,6 +58,9 @@ class _ChatScreenState extends State<ChatScreen> {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(
                   child: CircularProgressIndicator()); // 로딩 중일 때
+            }
+            if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+              return const Center(child: Text("메시지가 없습니다.")); // 데이터가 없을 때
             }
 
             final docs = snapshot.data!.docs;

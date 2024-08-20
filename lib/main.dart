@@ -1,6 +1,8 @@
+import 'package:chatapp/screens/chat_screen.dart';
 import 'package:chatapp/screens/main_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,6 +27,19 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: const LoginSignupScreen());
+        home: StreamBuilder(
+          stream: FirebaseAuth.instance.authStateChanges(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return const ChatScreen();
+            }
+            return const LoginSignupScreen();
+          },
+        )
+        // authentication state가 바뀔 때 이를 구독하기 위한 세가지 메서드 중 하나가 authStateChanges 메서드임.
+        // 다른 메소드로는 idTokenChanges 메서드와, userChanges 메서드가 있다.
+        // 로그인이나 로그아웃을 할 때마다 authentication state가 바뀌고, 이때 파이어베이스가 발급해준 토큰을 FirebaseAuth가 관리해준다.
+        // 우리는 간단하게 Stream을 authStateChanges 메서드로 구독만 해주면 된다.
+        );
   }
 }

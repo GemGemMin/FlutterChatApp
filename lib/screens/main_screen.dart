@@ -3,6 +3,7 @@ import 'package:chatapp/screens/chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LoginSignupScreen extends StatefulWidget {
   const LoginSignupScreen({super.key});
@@ -12,7 +13,7 @@ class LoginSignupScreen extends StatefulWidget {
 }
 
 class _LoginSignupScreenState extends State<LoginSignupScreen> {
-  bool isSignupScreen = true;
+  bool isSignupScreen = false;
   bool showSpinner = false;
   final _formKey = GlobalKey<FormState>();
   // 전송 버튼을 눌렀을 때 TextFormField의 내용을 전달하기 위해 GlobalKey를 사용
@@ -498,7 +499,19 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                           try {
                             final newUser = await _authentication
                                 .createUserWithEmailAndPassword(
-                                    email: userEmail, password: userPassword);
+                              email: userEmail,
+                              password: userPassword,
+                            );
+                            await FirebaseFirestore
+                                .instance // set 메소드가 Future 타입을 반환하므로 await 키워드를 붙여줘야 함.
+                                .collection('user')
+                                .doc(newUser
+                                    .user!.uid) // user는 null값이면 안되기 때문에 !를 붙여줌
+                                .set({
+                              'userName': userName,
+                              'userEmail': userEmail,
+                            });
+
                             if (newUser.user != null) {
                               Navigator.push(
                                 context,
@@ -527,16 +540,19 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                           try {
                             final newUser = await _authentication
                                 .signInWithEmailAndPassword(
-                                    email: userEmail, password: userPassword);
+                              email: userEmail,
+                              password: userPassword,
+                            );
+
                             if (newUser.user != null) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) {
-                                    return const ChatScreen();
-                                  },
-                                ),
-                              );
+                              // Navigator.push( // Navigator push 메서드로 페이지 이동을 하면 stack 방식으로 페이지가 위로 쌓이면서 이동을 구현한다.
+                              //   context,
+                              //   MaterialPageRoute(
+                              //     builder: (context) {
+                              //       return const ChatScreen();
+                              //     },
+                              //   ),
+                              // );
                             }
                           } catch (e) {
                             print(e);
