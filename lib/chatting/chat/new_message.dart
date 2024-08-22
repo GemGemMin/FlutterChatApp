@@ -14,13 +14,18 @@ class _NewMessageState extends State<NewMessage> {
 
   var _userEnterMessage = '';
 
-  void _sendMessage() {
+  void _sendMessage() async {
     FocusScope.of(context).unfocus();
     final user = FirebaseAuth.instance.currentUser;
+    final userData = await FirebaseFirestore.instance
+        .collection('user')
+        .doc(user!.uid)
+        .get();
     FirebaseFirestore.instance.collection('chat').add({
       'text': _userEnterMessage,
       'time': Timestamp.now(), // 타임스탬프 클래스는 cloud_firesotre에서 제공하는 것임.
-      'userId': user!.uid,
+      'userId': user.uid,
+      'userName': userData.data()!['userName'],
     });
     _controller.clear();
   }

@@ -527,12 +527,14 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                             }
                           } catch (e) {
                             print(e);
-                            ScaffoldMessenger.of(context)
-                                .showSnackBar(const SnackBar(
-                              content:
-                                  Text('Please check your email and password'),
-                              backgroundColor: Colors.blue,
-                            ));
+                            if (mounted) {
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(const SnackBar(
+                                content: Text(
+                                    'Please check your email and password'),
+                                backgroundColor: Colors.blue,
+                              ));
+                            }
                           }
                         }
                         if (!isSignupScreen) {
